@@ -146,17 +146,34 @@ document.querySelectorAll(".process-item").forEach((item) => processObserver.obs
 
 if (!reduceMotion) {
   document.querySelectorAll(".service-card, .plan-card").forEach((card) => {
+    const isPlanCard = card.classList.contains("plan-card");
+
+    card.addEventListener("pointerenter", () => {
+      if (isPlanCard) {
+        card.classList.add("is-pointer-active");
+      }
+    });
+
     card.addEventListener("pointermove", (event) => {
+      if (isPlanCard) {
+        card.classList.add("is-pointer-active");
+      }
+
       const rect = card.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width - 0.5;
       const y = (event.clientY - rect.top) / rect.height - 0.5;
       card.style.setProperty("--tilt-x", `${(-y * 5).toFixed(2)}deg`);
       card.style.setProperty("--tilt-y", `${(x * 5).toFixed(2)}deg`);
+      card.style.setProperty("--spot-x", `${((x + 0.5) * 100).toFixed(0)}%`);
+      card.style.setProperty("--spot-y", `${((y + 0.5) * 100).toFixed(0)}%`);
     });
 
     card.addEventListener("pointerleave", () => {
       card.style.setProperty("--tilt-x", "0deg");
       card.style.setProperty("--tilt-y", "0deg");
+      card.style.setProperty("--spot-x", "50%");
+      card.style.setProperty("--spot-y", "20%");
+      card.classList.remove("is-pointer-active");
     });
   });
 }
