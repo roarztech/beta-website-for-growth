@@ -408,7 +408,8 @@ h3 {
 .signal-number {
   display: block;
   margin-bottom: 18px;
-  color: var(--clay);
+  color: var(--green-dark);
+  text-shadow: 0 1px 0 rgba(168, 177, 150, 0.42);
   font-weight: 900;
 }
 
@@ -460,13 +461,12 @@ h3 {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--cream);
-  transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(var(--lift, 0));
+  transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(var(--reveal-y, 0px)) translateY(var(--lift, 0px)) scale(var(--pop-scale, 1));
   transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease;
   will-change: transform;
 }
 
-.service-card:hover,
-.plan-card:hover {
+.service-card:hover {
   --lift: -6px;
   border-color: rgba(47, 115, 85, 0.26);
   box-shadow: 0 22px 56px rgba(28, 36, 29, 0.13);
@@ -578,11 +578,66 @@ h3 {
 .plan-card {
   display: flex;
   flex-direction: column;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  cursor: pointer;
+  transform-origin: center;
+  transition: transform 120ms ease-out, border-color 120ms ease-out;
+}
+
+.plan-card::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at var(--spot-x, 50%) var(--spot-y, 20%), rgba(180, 118, 82, 0.34), transparent 36%),
+    radial-gradient(circle at var(--spot-x, 50%) var(--spot-y, 20%), rgba(47, 115, 85, 0.18), transparent 54%);
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.08);
+  transition: opacity 90ms ease-out;
+  content: "";
+}
+
+.plan-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.plan-card:hover,
+.plan-card:focus-within,
+.plan-card.is-pointer-active {
+  --lift: -16px;
+  --pop-scale: 1.055;
+  border-color: rgba(47, 115, 85, 0.42);
+  box-shadow: none;
+}
+
+.plan-card:hover::before,
+.plan-card:focus-within::before,
+.plan-card.is-pointer-active::before {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .plan-card.featured {
   background: var(--green-dark);
   color: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.plan-card.featured::before {
+  background:
+    radial-gradient(circle at var(--spot-x, 50%) var(--spot-y, 20%), rgba(255, 249, 233, 0.22), transparent 35%),
+    radial-gradient(circle at var(--spot-x, 50%) var(--spot-y, 20%), rgba(180, 118, 82, 0.28), transparent 56%);
+}
+
+.plan-card.featured:hover,
+.plan-card.featured:focus-within,
+.plan-card.featured.is-pointer-active {
+  --pop-scale: 1.065;
   box-shadow: var(--shadow);
 }
 
@@ -708,6 +763,22 @@ h3 {
   opacity: 1;
   transform: translateY(0) scale(1);
   filter: blur(0);
+}
+
+.service-card.reveal,
+.plan-card.reveal {
+  --reveal-y: 34px;
+  transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(var(--reveal-y, 0px)) translateY(var(--lift, 0px)) scale(var(--pop-scale, 1));
+}
+
+.plan-card.reveal {
+  transition: opacity 360ms ease, transform 120ms ease-out, filter 360ms ease, border-color 120ms ease-out;
+  transition-delay: 0ms;
+}
+
+.service-card.reveal.is-visible,
+.plan-card.reveal.is-visible {
+  --reveal-y: 0px;
 }
 
 @keyframes navDrop {
